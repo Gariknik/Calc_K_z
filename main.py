@@ -40,6 +40,7 @@ class Main(Tk):
         self.link_btn = ttk.Button(text="Пейти до розрахунку", width=30, command=self.click_for_solve)
         self.link_btn.bind("<Deactivate>", self.click_for_solve)
         self.link_btn.pack()
+    
     def click_for_solve(self):
         result = self.work_formula.get()
         self.window = Window.Window(Main, result)

@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk
 import lib.widgets as widgets
 from decimal import Decimal, ROUND_HALF_DOWN
+import re
 
 
 #Диалоговые окна
@@ -23,7 +24,7 @@ class Window(Tk):
         self.id = id
         self.frame = Frame(self, padx=0, pady=0)
         self.frame.pack()
-        self.list_params = []
+        self.list_params = ['>>0 або 0.00<<' for _ in range(8)]
         self.entries = []
         if self.id == '1':
             self.header = Label(self.frame, 
@@ -82,11 +83,17 @@ class Window(Tk):
             main()
             self.destroy()
 
-        def solved(self):
+          
 
-            for entry in self.entries:
+        def solved(self):
+            for key, entry in enumerate(self.entries):
                 el = entry.get()
-                self.list_params.append(Decimal(el))
+                if re.match(r"^\d(?:(?:\d*)|(?:\d*\.\d*))$", el) is not None:
+                    self.list_params[key] = Decimal(el)
+                else:
+                    entry.delete(0,END)
+                    entry.insert(0, self.list_params[key])
+            if not all(isinstance(it, Decimal) for it in self.list_params): return
 
             if self.id == '1':
                 K1, K_st, K0, Km, Ksh, Knz, Kp, K10 = self.list_params
@@ -94,8 +101,7 @@ class Window(Tk):
                 denominator = (1 - Ksh) * ((K10 * K_st +1) + Kp * (K0 * K_st + 1)) * Km
                 numerator.quantize(Decimal("1.000"), ROUND_HALF_DOWN)
                 denominator.quantize(Decimal("1.000"), ROUND_HALF_DOWN)
-                self.result = (numerator / denominator) * Knz
-                
+                self.result = (numerator / denominator) * Knz   
             else:
                 K1, K_st, K0, Km, Ksh, Knz, Kper, V1 = self.list_params
                 numerator = Decimal(0.65) * K1 * K_st * Kper
@@ -103,7 +109,7 @@ class Window(Tk):
                 numerator.quantize(Decimal("1.000"), ROUND_HALF_DOWN)
                 denominator.quantize(Decimal("1.000"), ROUND_HALF_DOWN)
                 self.result = (numerator / denominator) * Knz
-            
+
             self.print_result['text'] = 'Результат: Kзф =' + str(self.result.quantize(Decimal("1.00"), ROUND_HALF_DOWN))
 
 
