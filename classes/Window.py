@@ -26,6 +26,8 @@ class Window(Tk):
         self.frame.pack()
         self.list_params = ['>>0 або 0.00<<' for _ in range(8)]
         self.entries = []
+
+        #развёртивание полей для ввода параметров расчёта и их описания 
         if self.id == '1':
             self.header = Label(self.frame, 
                                 text="Кзф = [0,77 x К1  x К ст  x Кп / ((1-Кш) x  ((К’о x Кст +1) + Кп x (Ко x К ст +1)) x К м)] x KНЗ,        (Г.7) ",
@@ -71,21 +73,38 @@ class Window(Tk):
                         columnspan= 2, 
                         pady=[30, 0])
                     self.entries.append(entry)
-
+        #Вывод резултата
         self.print_result = Label(self.frame ,text="Результат: 0", font=("Arial", 11), fg='#008000')
         self.print_result.grid(row=9, column=0, columnspan= 3, ipadx=0, ipady=0, padx=[50, 50], pady=[30, 0])
-        #определение кнопок
 
+        #Функции для кнопок
+        #для кнопки закрыть
         def btn_closed(self):
+            """
+            Поцедура выполняет закритие программы
+            """
             self.destroy()
 
+        #для кнопки назад
         def btn_prev(self):
+            """
+            Поцедура выполняет откритие главного окна и закритие текущего
+            """
             main()
             self.destroy()
 
-          
-
+        #для кнопки расчёта
         def solved(self):
+            """
+            Поцедура выполняет следующие действия:
+            1) получаеть данные из всех полей ввода
+            2) проверяет данные согласно паттерну ^\d(?:(?:\d*)|(?:\d*\.\d*))$
+            3) при не правильном формате данных завершает работу возвращает None 
+            и устанавливает в проблемных полях значение '>>0 або 0.00<<'
+            4) если формат верний проводится расчёт по одной из двух главных
+            формул с передачей результата в self.print_result (Label)
+            """
+
             for key, entry in enumerate(self.entries):
                 el = entry.get()
                 if re.match(r"^\d(?:(?:\d*)|(?:\d*\.\d*))$", el) is not None:
@@ -112,15 +131,14 @@ class Window(Tk):
 
             self.print_result['text'] = 'Результат: Kзф =' + str(self.result.quantize(Decimal("1.00"), ROUND_HALF_DOWN))
 
-
-            
-
+        #Список словарей параметров кнопок 
         list_btn = [
             {'id': 0,'text': 'Назад', 'func': lambda: btn_prev(self)},
             {'id': 1,'text': 'Закрити', 'func': lambda: btn_closed(self)},
             {'id': 2, 'text': 'Розрахувати', 'func': lambda: solved(self)}
         ]
 
+        #Развёртивание кнопок в окне
         [ttk.Button(self.frame, 
                     text=el['text'], 
                     command=el['func']).grid(row=10, 

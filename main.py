@@ -10,7 +10,6 @@ class Main(Tk):
     """
     def __init__(self):
         super().__init__()    
-
         self.title("Розрахунок коефіцієнта захисту Кз для ПРУ") #устанавливаем заголовок окна
         self.geometry("800x600")
         self.resizable(False, False)
@@ -31,10 +30,13 @@ class Main(Tk):
         self.header = ttk.Label(textvariable=self.list_formulas[0]['text'])
         self.header.pack(**self.position)
 
-        radios = [Radiobutton(value=f["id"], text=f["text"], variable=self.work_formula, image=f["img"], compound="bottom") for f in self.list_formulas]
-
-        for radio in radios:
-            radio.pack(**self.position)
+        #разворачивание радио кнопок
+        radios = [Radiobutton(value=f["id"], 
+                              text=f["text"], 
+                              variable=self.work_formula, 
+                              image=f["img"], 
+                              compound="bottom") for f in self.list_formulas]
+        for radio in radios: radio.pack(**self.position)
 
         #Кнопка для направления к соответствующему расчёту
         self.link_btn = ttk.Button(text="Пейти до розрахунку", width=30, command=self.click_for_solve)
@@ -42,6 +44,9 @@ class Main(Tk):
         self.link_btn.pack()
     
     def click_for_solve(self):
+        """
+        Процедура открытия окна расчёта и закрития главного окна
+        """
         result = self.work_formula.get()
         self.window = Window.Window(Main, result)
         self.destroy()
